@@ -12,8 +12,11 @@ import Shop from './pages/Shop';
 import Detailing from './pages/Detailing';
 import Checkout from './pages/Checkout';
 import Service from './pages/Service';
+import AdminLogin from './pages/AdminLogin';
+import AdminDashboard from './pages/AdminDashboard';
 
 import { CartProvider } from './context/CartContext';
+import { AuthProvider } from './context/AuthContext';
 import { Canvas } from '@react-three/fiber';
 import { View } from '@react-three/drei';
 
@@ -22,19 +25,22 @@ function AppContent() {
   const isHome = location.pathname === '/';
   
   return (
-    <CartProvider>
-      <Background3D isHome={isHome} />
-      <Navbar />
-      <main className="content">
-        <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<Home />} />
-            <Route path="/shop" element={<Shop />} />
-            <Route path="/detailing" element={<Detailing />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/service" element={<Service />} />
-          </Routes>
-        </AnimatePresence>
+    <AuthProvider>
+      <CartProvider>
+        <Background3D isHome={isHome} />
+        <Navbar />
+        <main className="content">
+          <AnimatePresence mode="wait">
+            <Routes location={location} key={location.pathname}>
+              <Route path="/" element={<Home />} />
+              <Route path="/shop" element={<Shop />} />
+              <Route path="/detailing" element={<Detailing />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/service" element={<Service />} />
+              <Route path="/admin" element={<AdminLogin />} />
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            </Routes>
+          </AnimatePresence>
         
         {/* Global Canvas for Drei Views - Solves multiple Canvas WebGL context limit crashing */}
         <Canvas 
@@ -45,7 +51,8 @@ function AppContent() {
           <View.Port />
         </Canvas>
       </main>
-    </CartProvider>
+      </CartProvider>
+    </AuthProvider>
   );
 }
 

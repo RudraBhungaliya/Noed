@@ -1,11 +1,39 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PageWrapper } from '../components/PageWrapper';
 import { useCart } from '../context/CartContext';
 import { Trash2 } from 'lucide-react';
+import axios from 'axios';
 
 export default function Checkout() {
-  const { cart, getCartTotal, removeFromCart } = useCart();
+  const { cart, getCartTotal, removeFromCart, clearCart } = useCart();
   const total = getCartTotal();
+  const [success, setSuccess] = useState(false);
+
+  const handleCheckout = async (e) => {
+    e.preventDefault();
+    if (cart.length === 0) return alert("Your cart is empty.");
+
+    try {
+      const orderPayload = {
+        customerName: "Guest User", // Mock guest for now
+        customerEmail: "guest@example.com",
+        type: "Shop",
+        amount: `₹${total}`,
+        items: cart.map(item => ({
+          productId: item._id, // Live MongoDB ID
+          quantity: item.quantity,
+          price: item.price
+        }))
+      };
+
+      await axios.post('http://localhost:5000/api/orders', orderPayload);
+      clearCart();
+      setSuccess(true);
+    } catch (err) {
+      console.error("Order submission failed:", err);
+      alert("Failed to process order.");
+    }
+  };
   return (
     <PageWrapper>
       <div className="page-container" style={{ padding: '40px 10%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -40,21 +68,35 @@ export default function Checkout() {
           </div>
 
           <div className="glass" style={{ flex: 1, minWidth: '300px', padding: '30px', display: 'flex', flexDirection: 'column', gap: '20px', background: '#ffffff' }}>
-            <h2 style={{ fontSize: '1.5rem', color: 'var(--text-primary)' }}>Payment & Delivery</h2>
+            <h2 style={{ fontSize: '1.5rem', marginBottom: '10px', color: 'var(--text-primary)' }}>Secure Payment</h2>
             
-            <div style={{ background: 'rgba(0,0,128,0.03)', padding: '15px', borderRadius: '4px', border: '1px solid rgba(0,0,128,0.1)' }}>
-              <p style={{ fontWeight: 600, marginBottom: '5px', color: 'var(--text-primary)' }}>Delivery Partner: Shiprocket</p>
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Estimated delivery: 3-5 standard days.</p>
-            </div>
+            {success ? (
+              <div style={{ padding: '20px', background: 'rgba(0,255,100,0.1)', border: '1px solid #00cc66', borderRadius: '8px', color: '#00cc66', textAlign: 'center' }}>
+                <h3 style={{ marginBottom: '10px' }}>Order Deployed!</h3>
+                <p>Your 3D prints are scheduled for manufacturing. The Engineering team will notify you upon dispatch via Shiprocket.</p>
+              </div>
+            ) : (
+              <>
+                <div style={{ padding: '20px', background: 'rgba(0,0,128,0.02)', borderRadius: '8px', border: '1px solid rgba(0,0,128,0.1)' }}>
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg" alt="UPI" style={{ height: '30px', marginBottom: '15px' }} />
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '15px' }}>Scan with any UPI app to pay directly to Noed Engineering.</p>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <input type="text" placeholder="Enter UPI ID (e.g., user@okicici)" style={{ flex: 1, padding: '10px', borderRadius: '4px', border: '1px solid var(--glass-border)' }} />
+                    <button className="btn-secondary" style={{ padding: '10px 15px' }}>Verify</button>
+                  </div>
+                </div>
 
-            <div style={{ background: 'rgba(0,0,128,0.03)', padding: '15px', borderRadius: '4px', border: '1px solid rgba(0,0,128,0.1)' }}>
-              <p style={{ fontWeight: 600, marginBottom: '5px', color: 'var(--text-primary)' }}>UPI Payment Gateway</p>
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Scan QR or enter VPA securely via your PSP app.</p>
-            </div>
+                <div style={{ padding: '20px', background: 'rgba(0,0,128,0.02)', borderRadius: '8px', border: '1px solid rgba(0,0,128,0.1)' }}>
+                  <h3 style={{ fontSize: '1.1rem', marginBottom: '10px', color: 'var(--text-primary)' }}>Delivery Processing via Shiprocket</h3>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>We partner with Shiprocket to guarantee rapid, secure dispatch of fragile 3D printed components nationwide. Tracking IDs are generated automatically post-fabrication.</p>
+                </div>
 
-            <button className="btn-primary" style={{ marginTop: 'auto' }}>Pay Now</button>
+                <button onClick={handleCheckout} className="btn-primary" style={{ width: '100%', padding: '15px', fontSize: '1.1rem', marginTop: 'auto' }}>
+                  Authorize Payment (₹{total.toLocaleString()})
+                </button>
+              </>
+            )}
           </div>
-
         </div>
       </div>
     </PageWrapper>
