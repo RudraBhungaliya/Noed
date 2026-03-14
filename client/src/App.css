@@ -39,8 +39,14 @@
 
 .nav-link {
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   position: relative;
+}
+
+@media (min-width: 768px) {
+  .desktop-only-name {
+    display: inline-block !important;
+  }
 }
 
 .nav-link::after {

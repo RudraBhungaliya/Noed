@@ -14,6 +14,10 @@ import Checkout from './pages/Checkout';
 import Service from './pages/Service';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Profile from './pages/Profile';
+import ProductDetail from './pages/ProductDetail';
 
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
@@ -37,8 +41,11 @@ function AppContent() {
               <Route path="/detailing" element={<Detailing />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/service" element={<Service />} />
-              <Route path="/admin" element={<AdminLogin />} />
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
             </Routes>
           </AnimatePresence>
         

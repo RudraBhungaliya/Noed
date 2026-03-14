@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PageWrapper } from '../components/PageWrapper';
 import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import { Canvas, useFrame } from '@react-three/fiber';
@@ -74,6 +75,7 @@ function ProductViewer({ product, isHovered }) {
 const InteractiveCard = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
   const { addToCart } = useCart();
+  const navigate = useNavigate();
 
   // Motion values for tilt
   const x = useMotionValue(0);
@@ -132,6 +134,7 @@ const InteractiveCard = ({ product }) => {
         rotateY,
         transformStyle: "preserve-3d"
       }}
+      onClick={() => navigate(`/product/${product._id}`)}
       className="glass"
     >
       {/* Inner div that translates Z on hover to give depth effect to content */}
@@ -182,6 +185,7 @@ const InteractiveCard = ({ product }) => {
 export default function Shop() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProducts = async () => {
